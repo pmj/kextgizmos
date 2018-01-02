@@ -36,3 +36,19 @@
 		OSReportWithBacktrace(#CLASS " %p retain:  %2d -> %2d (tag = %p)\n", this, count, count + 1, tag); \
 		this->SUPERCLASS::taggedRetain(tag); \
 	}
+
+__private_extern__ kmod_info_t kmod_info;
+
+#define DJ_KEXTGIZMO_STRINGIFY2(MACRONAME) #MACRONAME
+#define DJ_KEXTGIZMO_STRINGIFY(MACRONAME) DJ_KEXTGIZMO_STRINGIFY2(MACRONAME)
+
+struct DJKextgizmoKextAddressDump
+{
+	DJKextgizmoKextAddressDump()
+	{
+		kmod_info_t* info = &kmod_info;
+		kprintf("Kext '%." DJ_KEXTGIZMO_STRINGIFY(KMOD_MAX_NAME) "s' start address: 0x%16lx, end address: 0x%16lx. kmod info: %p\n", info->name, info->address, info->address + info->size - 1, info);
+	}
+};
+
+static DJKextgizmoKextAddressDump address_dump;
