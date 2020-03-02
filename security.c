@@ -69,7 +69,7 @@ static vnode_t proc_get_textvp(proc_t p)
 		break;
 	};
 	
-	if (0 == vnode_get(result))
+	if (result != NULLVP && 0 == vnode_get(result))
 		return result;
 	else
 		return NULLVP;
