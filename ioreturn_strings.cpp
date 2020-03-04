@@ -51,7 +51,27 @@ misrepresented as being the original software.
 */
 
 #include "ioreturn_strings.h"
+
+
+#if KERNEL
+
+#include <libkern/version.h>
+#if VERSION_MAJOR >= 15
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdocumentation"
+#pragma clang diagnostic ignored "-Winconsistent-missing-override"
+#pragma clang diagnostic ignored "-Wdeprecated-register"
+#include <IOKit/usb/IOUSBHostInterface.h>
 #include <IOKit/usb/USB.h>
+
+#pragma clang diagnostic pop
+#else
+#include <IOKit/usb/USB.h>
+#endif
+
+#else
+#include <IOKit/usb/USB.h>
+#endif
 
 #define RET_CASE(E) case E: return #E
 
@@ -147,13 +167,24 @@ const char* djt_ioreturn_string(IOReturn r)
 		RET_CASE(kIOUSBSyncRequestOnWLThread);
 		RET_CASE(kIOUSBClearPipeStallNotRecursive);
 #if VERSION_MAJOR > 10
-		RET_CASE(kIOUSBDevicePortWasNotSuspended);
+#ifdef kIOUSBDeviceTransferredToCompanion
 		RET_CASE(kIOUSBDeviceTransferredToCompanion);
+#endif
+#ifdef kIOUSBEndpointCountExceeded
 		RET_CASE(kIOUSBEndpointCountExceeded);
+#endif
+#ifdef kIOUSBDeviceCountExceeded
 		RET_CASE(kIOUSBDeviceCountExceeded);
+#endif
+#ifdef kIOUSBStreamsNotSupported
 		RET_CASE(kIOUSBStreamsNotSupported);
+#endif
+#ifdef kIOUSBInvalidSSEndpoint
 		RET_CASE(kIOUSBInvalidSSEndpoint);
+#endif
+#ifdef kIOUSBTooManyTransactionsPending
 		RET_CASE(kIOUSBTooManyTransactionsPending);
+#endif
 #endif
 		RET_CASE(kIOUSBLinkErr);
 		RET_CASE(kIOUSBNotSent2Err);
@@ -199,7 +230,10 @@ const char* djt_ioreturn_string(IOReturn r)
 		RET_CASE(kIOUSBMessageTDMLowBattery);
 */
 		default:
-			return "IOKIT-COMMON-UNKNOWN";
+			// This one is weird, in some SDK versions, it's equal to kIOUSBTransactionReturned so we can't have a case: for it
+			if (r == kIOUSBDevicePortWasNotSuspended)
+				return "kIOUSBDevicePortWasNotSuspended";
+			return "IOKIT-USB-UNKNOWN";
 		}
 	}
 	return "IOKIT-UNKNOWN-UNKNOWN";
