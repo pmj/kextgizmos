@@ -5,7 +5,7 @@ kextgizmos osdictionary_util
 Dual-licensed under the MIT and zLib licenses.
 
 
-Copyright 2018 Phillip & Laura Dennis-Jordan
+Copyright 2018-2019 Phillip & Laura Dennis-Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -27,7 +27,7 @@ SOFTWARE.
 
 
 
-Copyright (c) 2018 Phillip & Laura Dennis-Jordan
+Copyright (c) 2018-2019 Phillip & Laura Dennis-Jordan
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use
@@ -49,10 +49,18 @@ misrepresented as being the original software.
 
 */
 
-#prama once
+#pragma once
+
+#include <stdint.h>
 
 class OSDictionary;
 #ifdef __cplusplus
 extern "C"
 #endif
-void log_dictionary_contents(OSDictionary* table);
+void log_dictionary_contents(OSDictionary* table, bool recurse = false, unsigned indent = 0);
+
+bool DJTDictionarySetNumber(OSDictionary* dictionary, const char* key, uint64_t value);
+bool DJTDictionarySetString(OSDictionary* dictionary, const char* key, const char* string, uint32_t string_max_len);
+
+// Creates a copy of 'into' and then merges the key/values of 'dictionary' into that copy
+OSDictionary* djt_osdictionary_create_merged(OSDictionary* dictionary, OSDictionary* into);
