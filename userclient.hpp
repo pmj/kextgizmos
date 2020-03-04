@@ -53,6 +53,8 @@ misrepresented as being the original software.
 
 #include <IOKit/IOReturn.h>
 #include <libkern/c++/OSObject.h>
+#include <stdint.h>
+#include <sys/types.h>
 
 class IOMemoryMap;
 
@@ -60,7 +62,7 @@ class IOMemoryMap;
  * changes are not caught. External methods are expected to be of type
  * IOExternalMethodAction. So wrap each member function in this shim with the
  * correct type that forwards the arguments:
- * &br_external_method<&SomeServiceUserClient::startReceivingEvents>
+ * &userclient_external_methods<SomeServiceUserClient>::external_method<&SomeServiceUserClient::startReceivingEvents>
  * is of type IOExternalMethodAction, even though
  * SomeServiceUserClient::startReceivingEvents isn't.
  *
@@ -1117,8 +1119,32 @@ namespace
 
 
 #endif
+
+#if (__cplusplus >= 201103L)
+	template <typename T, size_t N> constexpr size_t array_length(T(&a)[N])
+	{
+		return N;
+	}
+#else
+	#define array_length(A) (sizeof((A)[0])/sizeof(A))
+#endif
+	
+	template <size_t NUM_SEL> IOReturn djt_dispatch_methods(
+		const IOExternalMethodDispatch (&methods)[NUM_SEL], IOUserClient* client, uint32_t selector, IOExternalMethodArguments* arguments, IOExternalMethodDispatch* dispatch, OSObject* target, void* reference)
+	{
+		IOExternalMethodDispatch method_dispatch = {};
+		if (selector < array_length(methods) && methods[selector].function != nullptr)
+		{
+			method_dispatch = methods[selector];
+			dispatch = &method_dispatch;
+			target = client;
+		}
+		return client->IOUserClient::externalMethod(selector, arguments, dispatch, target, reference);
+	}
+
 }
 
 const void* dj_iouserclient_map_input_struct(
 	IOExternalMethodArguments* args, IOMemoryMap*& out_map, uint32_t& out_size);
 
+#define DJT_IOUC_METHOD(METHOD) userclient_method<decltype(&METHOD), &METHOD>::dispatch
