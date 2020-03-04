@@ -123,7 +123,12 @@ const char* djt_ioreturn_string(IOReturn r)
 		RET_CASE(kIOReturnIsoTooNew);
 		RET_CASE(kIOReturnNotFound);
 		RET_CASE(kIOReturnInvalid);
-		
+		default:
+			return "IOKIT-COMMON-UNKNOWN";
+		};
+	case sub_iokit_usb:
+		switch (r)
+		{
 		// USB specific return values:
 		RET_CASE(kIOUSBUnknownPipeErr);
 		RET_CASE(kIOUSBTooManyPipesErr);
