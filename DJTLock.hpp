@@ -98,4 +98,9 @@ public:
 			OSSafeReleaseNULL(this->lock);
 		}
 	}
+	
+	DJTLock* getLock() const
+	{
+		return this->lock;
+	}
 };
