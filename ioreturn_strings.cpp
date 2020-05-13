@@ -6,7 +6,7 @@ IOReturn codes.
 Dual-licensed under the MIT and zLib licenses.
 
 
-Copyright 2018 Phillip & Laura Dennis-Jordan
+Copyright 2018-2020 Phillip & Laura Dennis-Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -28,7 +28,7 @@ SOFTWARE.
 
 
 
-Copyright (c) 2018 Phillip & Laura Dennis-Jordan
+Copyright (c) 2018-2020 Phillip & Laura Dennis-Jordan
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use
@@ -69,6 +69,7 @@ misrepresented as being the original software.
 #include <IOKit/usb/USB.h>
 #endif
 
+#elif TARGET_OS_DRIVERKIT
 #else
 #include <IOKit/usb/USB.h>
 #endif
@@ -150,6 +151,7 @@ const char* djt_ioreturn_string(IOReturn r)
 		switch (r)
 		{
 		// USB specific return values:
+#if !TARGET_OS_DRIVERKIT
 		RET_CASE(kIOUSBUnknownPipeErr);
 		RET_CASE(kIOUSBTooManyPipesErr);
 		RET_CASE(kIOUSBNoAsyncPortErr);
@@ -198,7 +200,7 @@ const char* djt_ioreturn_string(IOReturn r)
 		RET_CASE(kIOUSBDataToggleErr);
 		RET_CASE(kIOUSBBitstufErr);
 		RET_CASE(kIOUSBCRCErr);
-		
+
 /*
 		// USB message specific return values:
 		RET_CASE(kIOUSBMessageHubResetPort);
@@ -229,10 +231,15 @@ const char* djt_ioreturn_string(IOReturn r)
 		RET_CASE(kIOUSBMessageHubCountExceeded);
 		RET_CASE(kIOUSBMessageTDMLowBattery);
 */
+#endif
+
+
 		default:
 			// This one is weird, in some SDK versions, it's equal to kIOUSBTransactionReturned so we can't have a case: for it
+#if !TARGET_OS_DRIVERKIT
 			if (r == kIOUSBDevicePortWasNotSuspended)
 				return "kIOUSBDevicePortWasNotSuspended";
+#endif
 			return "IOKIT-USB-UNKNOWN";
 		}
 	}

@@ -6,7 +6,7 @@ IOReturn codes.
 Dual-licensed under the MIT and zLib licenses.
 
 
-Copyright 2018 Phillip & Laura Dennis-Jordan
+Copyright 2018-2020 Phillip & Laura Dennis-Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -28,7 +28,7 @@ SOFTWARE.
 
 
 
-Copyright (c) 2018 Phillip & Laura Dennis-Jordan
+Copyright (c) 2018-2020 Phillip & Laura Dennis-Jordan
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use
@@ -52,7 +52,12 @@ misrepresented as being the original software.
 
 #pragma once
 
+#include <TargetConditionals.h>
+#if !TARGET_OS_DRIVERKIT
 #include <IOKit/IOReturn.h>
+#else
+#include <DriverKit/IOReturn.h>
+#endif
 
 #ifdef __cplusplus
 extern "C"
