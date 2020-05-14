@@ -5,7 +5,7 @@ kextgizmos osdictionary_util
 Dual-licensed under the MIT and zLib licenses.
 
 
-Copyright 2018-2019 Phillip & Laura Dennis-Jordan
+Copyright 2018-2020 Phillip & Laura Dennis-Jordan
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of
 this software and associated documentation files (the "Software"), to deal in
@@ -27,7 +27,7 @@ SOFTWARE.
 
 
 
-Copyright (c) 2018-2019 Phillip & Laura Dennis-Jordan
+Copyright (c) 2018-2020 Phillip & Laura Dennis-Jordan
 
 This software is provided 'as-is', without any express or implied warranty. In
 no event will the authors be held liable for any damages arising from the use
@@ -50,6 +50,17 @@ misrepresented as being the original software.
 */
 
 #include "osdictionary_util.hpp"
+#include <TargetConditionals.h>
+
+#if TARGET_OS_DRIVERKIT
+// DEXT
+#include <DriverKit/OSNumber.h>
+#include <DriverKit/OSString.h>
+#include <DriverKit/OSDictionary.h>
+#include <DriverKit/IOLib.h>
+
+#else
+// KEXT
 #include <libkern/c++/OSDictionary.h>
 #include <libkern/c++/OSCollectionIterator.h>
 #include <libkern/c++/OSString.h>
@@ -64,6 +75,8 @@ misrepresented as being the original software.
 #pragma clang diagnostic pop
 
 #define KLog(...) ({ IOLog(__VA_ARGS__); kprintf(__VA_ARGS__); })
+#endif // end platform specific
+
 
 #if defined (__cplusplus) && __cplusplus < 201103L && !defined(nullptr)
 
@@ -78,6 +91,8 @@ public:
 
 #define nullptr (DJTNullptr())
 #endif
+
+#if !TARGET_OS_DRIVERKIT
 
 void log_dictionary_contents(OSDictionary* table, bool recurse, unsigned indent)
 {
@@ -159,6 +174,7 @@ void log_dictionary_contents(OSDictionary* table, bool recurse, unsigned indent)
 		OSSafeReleaseNULL(iter);
 	}
 }
+#endif
 
 bool DJTDictionarySetNumber(OSDictionary* dictionary, const char* key, uint64_t value)
 {
@@ -183,9 +199,9 @@ bool DJTDictionarySetString(OSDictionary* dictionary, const char* key, const cha
 OSDictionary* djt_osdictionary_create_merged(OSDictionary* dictionary, OSDictionary* into)
 {
 	if (into == nullptr)
-		return OSDictionary::withDictionary(dictionary);
+		return OSDictionary::withDictionary(dictionary, dictionary->getCount());
 	
-	OSDictionary* created = OSDictionary::withDictionary(into);
+	OSDictionary* created = OSDictionary::withDictionary(into, into->getCount() + (dictionary ? dictionary->getCount() : 0));
 	if (dictionary == nullptr)
 		return created;
 	
