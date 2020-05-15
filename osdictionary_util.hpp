@@ -60,6 +60,7 @@ extern "C"
 void log_dictionary_contents(OSDictionary* table, bool recurse = false, unsigned indent = 0);
 
 bool DJTDictionarySetNumber(OSDictionary* dictionary, const char* key, uint64_t value);
+bool DJTDictionarySetBoolean(OSDictionary* dictionary, const char* key, bool value);
 bool DJTDictionarySetString(OSDictionary* dictionary, const char* key, const char* string, uint32_t string_max_len);
 
 // Creates a copy of 'into' and then merges the key/values of 'dictionary' into that copy

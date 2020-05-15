@@ -55,6 +55,7 @@ misrepresented as being the original software.
 #if TARGET_OS_DRIVERKIT
 // DEXT
 #include <DriverKit/OSNumber.h>
+#include <DriverKit/OSBoolean.h>
 #include <DriverKit/OSString.h>
 #include <DriverKit/OSDictionary.h>
 #include <DriverKit/IOLib.h>
@@ -182,6 +183,11 @@ bool DJTDictionarySetNumber(OSDictionary* dictionary, const char* key, uint64_t 
 	bool ok = dictionary->setObject(key, number);
 	OSSafeReleaseNULL(number);
 	return ok;
+}
+
+bool DJTDictionarySetBoolean(OSDictionary* dictionary, const char* key, bool value)
+{
+	return dictionary->setObject(key, value ? kOSBooleanTrue : kOSBooleanFalse);
 }
 
 bool DJTDictionarySetString(OSDictionary* dictionary, const char* key, const char* string, uint32_t string_max_len)
