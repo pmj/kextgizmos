@@ -66,7 +66,10 @@ misrepresented as being the original software.
 
 #pragma clang diagnostic pop
 #else
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wdeprecated-register"
 #include <IOKit/usb/USB.h>
+#pragma clang diagnostic pop
 #endif
 
 #elif TARGET_OS_DRIVERKIT
