@@ -65,16 +65,21 @@ misrepresented as being the original software.
 #include <IOKit/usb/USB.h>
 
 #pragma clang diagnostic pop
+
 #else
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-register"
 #include <IOKit/usb/USB.h>
 #pragma clang diagnostic pop
+
 #endif
 
 #elif TARGET_OS_DRIVERKIT
+#include <USBDriverKit/IOUSBHostFamilyDefinitions.h>
 #else
 #include <IOKit/usb/USB.h>
+#include <IOKit/usb/IOUSBHostFamilyDefinitions.h>
 #endif
 
 #define RET_CASE(E) case E: return #E
@@ -235,7 +240,12 @@ const char* djt_ioreturn_string(IOReturn r)
 		RET_CASE(kIOUSBMessageTDMLowBattery);
 */
 #endif
-
+		
+		static_assert((kUSBHostReturnPipeStalled & system_emask) == sys_iokit, "");
+		static_assert((kUSBHostReturnPipeStalled & sub_emask) == sub_iokit_usb, "");
+		
+		RET_CASE(kUSBHostReturnPipeStalled);
+		RET_CASE(kUSBHostReturnNoPower);
 
 		default:
 			// This one is weird, in some SDK versions, it's equal to kIOUSBTransactionReturned so we can't have a case: for it
