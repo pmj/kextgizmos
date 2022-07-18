@@ -77,6 +77,7 @@ misrepresented as being the original software.
 
 #elif TARGET_OS_DRIVERKIT
 #include <USBDriverKit/IOUSBHostFamilyDefinitions.h>
+#elif TARGET_OS_IOS
 #else
 #include <IOKit/usb/USB.h>
 #include <IOKit/usb/IOUSBHostFamilyDefinitions.h>
@@ -159,7 +160,7 @@ const char* djt_ioreturn_string(IOReturn r)
 		switch (r)
 		{
 		// USB specific return values:
-#if !TARGET_OS_DRIVERKIT
+#if !TARGET_OS_DRIVERKIT && !TARGET_OS_IOS
 		RET_CASE(kIOUSBUnknownPipeErr);
 		RET_CASE(kIOUSBTooManyPipesErr);
 		RET_CASE(kIOUSBNoAsyncPortErr);
@@ -241,15 +242,17 @@ const char* djt_ioreturn_string(IOReturn r)
 */
 #endif
 		
+#if !TARGET_OS_IOS
 		static_assert((kUSBHostReturnPipeStalled & system_emask) == sys_iokit, "");
 		static_assert((kUSBHostReturnPipeStalled & sub_emask) == sub_iokit_usb, "");
 		
 		RET_CASE(kUSBHostReturnPipeStalled);
 		RET_CASE(kUSBHostReturnNoPower);
+#endif
 
 		default:
 			// This one is weird, in some SDK versions, it's equal to kIOUSBTransactionReturned so we can't have a case: for it
-#if !TARGET_OS_DRIVERKIT
+#if !TARGET_OS_DRIVERKIT && !TARGET_OS_IOS
 			if (r == kIOUSBDevicePortWasNotSuspended)
 				return "kIOUSBDevicePortWasNotSuspended";
 #endif
