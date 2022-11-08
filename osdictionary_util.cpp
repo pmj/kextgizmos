@@ -193,7 +193,7 @@ bool DJTDictionarySetBoolean(OSDictionary* dictionary, const char* key, bool val
 bool DJTDictionarySetString(OSDictionary* dictionary, const char* key, const char* string, uint32_t string_max_len)
 {
 	size_t length = strnlen(string, string_max_len);
-	char terminated_string[length + 1];
+	char* terminated_string = static_cast<char*>(alloca(length + 1));
 	memcpy(terminated_string, string, length);
 	terminated_string[length] = '\0';
 	OSString* string_obj = OSString::withCString(terminated_string);
