@@ -75,6 +75,12 @@ misrepresented as being the original software.
 #include <IOKit/IOLib.h>
 #pragma clang diagnostic pop
 
+#if __has_builtin(__builtin_alloca)
+#define alloca(s) __builtin_alloca(s)
+#else
+extern void* alloca(size_t);
+#endif
+
 #define KLog(...) ({ IOLog(__VA_ARGS__); kprintf(__VA_ARGS__); })
 #endif // end platform specific
 
