@@ -85,9 +85,14 @@ misrepresented as being the original software.
 static inline const char* usb_interface_classname(bool modern_iousbhost)
 {
 #if TARGET_OS_IOS
-    return kIOUSBHostInterfaceClassName;
+	return kIOUSBHostInterfaceClassName;
 #else
-    return modern_iousbhost ? kIOUSBHostInterfaceClassName : kIOUSBInterfaceClass;
+	return modern_iousbhost ? kIOUSBHostInterfaceClassName :
+#ifdef kIOUSBInterfaceClass
+		kIOUSBInterfaceClass;
+#else
+		kIOUSBInterfaceClassName;
+#endif
 #endif
 }
 
@@ -162,4 +167,16 @@ CFMutableDictionaryRef DJTCreateIOUSBInterfaceVIDPIDsRevisionMatch(
     CFMutableDictionaryRef dict = DJTCreateIOUSBInterfaceVIDPIDsMatch(vendor_id, product_ids, num_product_ids, interface_number, configuration_value, modern_iousbhost_classnames);
     dictionary_set_number_value(dict, CFSTR(kUSBHostMatchingPropertyDeviceReleaseNumber), revision_bcd_device);
     return dict;
+}
+
+CFMutableDictionaryRef DJTCreateIOUSBInterfaceVIDVendorSpecificSubclassProtocolMatch(
+	uint16_t vendor_id, uint8_t interface_subclass, uint8_t interface_protocol,
+	bool modern_iousbhost_classnames)
+{
+	non_macos_assert(modern_iousbhost_classnames);
+	CFMutableDictionaryRef dict = IOServiceMatching(usb_interface_classname(modern_iousbhost_classnames));
+	dictionary_set_number_value(dict, CFSTR(kUSBHostMatchingPropertyVendorID), vendor_id);
+	dictionary_set_number_value(dict, CFSTR(kUSBHostMatchingPropertyInterfaceSubClass), interface_subclass);
+	dictionary_set_number_value(dict, CFSTR(kUSBHostMatchingPropertyInterfaceProtocol), interface_protocol);
+	return dict;
 }

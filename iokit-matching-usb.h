@@ -89,6 +89,11 @@ CFMutableDictionaryRef DJTCreateIOUSBInterfaceVIDPIDsRevisionMatch(
     uint8_t interface_number, uint8_t configuration_value,
     uint8_t revision_bcd_device, bool modern_iousbhost_classnames DJT_ARG_DEFAULT(true));
 
+CFMutableDictionaryRef DJTCreateIOUSBInterfaceVIDVendorSpecificSubclassProtocolMatch(
+	uint16_t vendor_id, uint8_t interface_subclass, uint8_t interface_protocol,
+	bool modern_iousbhost_classnames DJT_ARG_DEFAULT(true));
+
+
 #ifdef __cplusplus
 } // extern "C" block
 #endif
